@@ -15,20 +15,22 @@ final_phenotype_measurement_df <- final_phenotype_measurement_df[-c(30:999),]
 # convert n/a to NA
 initial_phenotype_measurement_df[initial_phenotype_measurement_df == "n/a"] <- NA
 final_phenotype_measurement_df[final_phenotype_measurement_df == "n/a"] <- NA
-# # data frame to matrix
-# initial_phenotype_measurement_matrix <-  data.matrix(initial_phenotype_measurement_df)
-# final_phenotype_measurement_matrix <- data.matrix(final_phenotype_measurement_df)
-initial_vector_temp <- as.vector(as.matrix(initial_phenotype_measurement_df))
 
 # ordinal columns
-ordinal_columns <- c(6:16,22,38:44)
+ordinal_columns <- c(6:16,22,38,44)
+
+# nominal columns 
+nominal_columns <- c(39:43)
 # continuous columns
 continuous_columns <- c(17:21,23:27,28:32,33:37)
+
 # Create a matrix that will store the percent change and true or false statements
 # and soft code the values for the rows and columns
 results_matrix <- matrix(nrow = dim(initial_phenotype_measurement_df)[1], ncol = dim(initial_phenotype_measurement_df)[2])
+
 # concatenate column names into the columns object 
 columns<-c(colnames(final_phenotype_measurement_df))
+
 # add the column names to the results_matrix
 colnames(results_matrix) <- columns
 
@@ -38,6 +40,12 @@ colnames(results_matrix)
 
 # vectorize the true or false parameters by comparing the lenticel shape columns between both matrices
 results_matrix[,ordinal_columns] <- initial_phenotype_measurement_df[,ordinal_columns] == final_phenotype_measurement_df[,ordinal_columns]
+  
+for (i in 1:nrow(initial_phenotype_measurement_df)) {
+  results_matrix[i,nominal_columns] <- sort(as.double(initial_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE) == sort(as.double(final_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE)
+}
+
+
 
 
 # for loop that iterates through the various columns
@@ -52,10 +60,24 @@ for (i in 1:29) {
 results_df <- data.frame(results_matrix)
 
 # converting all the 1 and 0 values to TRUE or FALSE with boolean phrase
-results_df[,ordinal_columns] <- results_df[,ordinal_columns] == 1
+results_df[,c(ordinal_columns, nominal_columns)] <- results_df[,c(ordinal_columns,nominal_columns)] == 1
 
 # save the csv file of the results
-write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
+# write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
 
 # approaches to creating the true/false table IN PROGRESS
-sum(results_df[,6], na.rm = TRUE)
+categorical_table_results <- matrix(nrow = length(ordinal_columns), ncol = 2)
+
+for (i in 1:length(nominal_columns)) {
+  col_index <- nominal_columns[i]  # Get the actual column index
+  categorical_table_results[i,1] <- colnames(results_df)[col_index]  # Store column name
+  categorical_table_results[i,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
+}
+
+for (i in 1:length(ordinal_columns)) {
+  col_index <- ordinal_columns[i]  # Get the actual column index
+  categorical_table_results[i,1] <- colnames(results_df)[col_index]  # Store column name
+  categorical_table_results[i,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
+}
+
+# write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))

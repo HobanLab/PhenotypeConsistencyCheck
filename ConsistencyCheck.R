@@ -34,10 +34,6 @@ columns<-c(colnames(final_phenotype_measurement_df))
 # add the column names to the results_matrix
 colnames(results_matrix) <- columns
 
-# double check the column names appear in the results matrix
-colnames(results_matrix)
-
-
 # vectorize the true or false parameters by comparing the lenticel shape columns between both matrices
 results_matrix[,ordinal_columns] <- initial_phenotype_measurement_df[,ordinal_columns] == final_phenotype_measurement_df[,ordinal_columns]
   
@@ -49,11 +45,11 @@ for (i in 1:nrow(initial_phenotype_measurement_df)) {
 
 
 # for loop that iterates through the various columns
-for (i in 1:29) {
-  results_matrix[i, 17:21] <- sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE)
-  results_matrix[i, 23:27] <- sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE)
-  results_matrix[i, 28:32] <- sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE) - sort(as.double(final_phenotype_measurement_df[i,28:32]), na.last = TRUE)
-  results_matrix[i, 33:37] <- sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE) - sort(as.double(final_phenotype_measurement_df[i,33:37]), na.last = TRUE)
+for (i in 1:nrow(results_matrix)) {
+  results_matrix[i, 17:21] <- 100*(sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE)
+  results_matrix[i, 23:27] <- 100*(sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE)
+  results_matrix[i, 28:32] <- 100*(sort(as.double(final_phenotype_measurement_df[i,28:32]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE)
+  results_matrix[i, 33:37] <- 100*(sort(as.double(final_phenotype_measurement_df[i,33:37]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE)
 }  
 
 # all the true false statements were turned to 1's and 0's after calling the  for loop. so we will want to change the matrix to a dataframe.
@@ -65,19 +61,40 @@ results_df[,c(ordinal_columns, nominal_columns)] <- results_df[,c(ordinal_column
 # save the csv file of the results
 # write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
 
-# approaches to creating the true/false table IN PROGRESS
-categorical_table_results <- matrix(nrow = length(ordinal_columns), ncol = 2)
+# approaches to creating the table that calculates the percentage of TRUE values that matched after comparing the columns of both tables 
+categorical_table_results <- as.data.frame(matrix(nrow = length(ordinal_columns)+length(nominal_columns), ncol = 2))
 
 for (i in 1:length(nominal_columns)) {
   col_index <- nominal_columns[i]  # Get the actual column index
-  categorical_table_results[i,1] <- colnames(results_df)[col_index]  # Store column name
-  categorical_table_results[i,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
+  categorical_table_results[i+13,1] <- colnames(results_df)[col_index]  # Store column name
+  categorical_table_results[i+13,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
 }
 
-for (i in 1:length(ordinal_columns)) {
-  col_index <- ordinal_columns[i]  # Get the actual column index
-  categorical_table_results[i,1] <- colnames(results_df)[col_index]  # Store column name
-  categorical_table_results[i,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
+for (j in 1:length(ordinal_columns)) {
+  if (j < 14){
+    col_index <- ordinal_columns[j]  # Get the actual column index
+    categorical_table_results[j,1] <- colnames(results_df)[col_index]  # Store column name
+    categorical_table_results[j,2] <- 100 * (sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]])))
+  }
+  else {
+    categorical_table_results[j+5,1] <- colnames(results_df)[col_index+6]
+    categorical_table_results[j+5,2] <- 100 * (sum(results_df[[col_index+6]], na.rm = TRUE) / sum(!is.na(results_df[[col_index+6]])))
+  }
 }
+
+categorical_table_results
+
+# categorical_table_results[19,1] <- colnames(results_df)[44]  # Store column name
+# categorical_table_results[19,2] <- 100 * (sum(results_df[[44]], na.rm = TRUE) / sum(!is.na(results_df[[44]])))
 
 # write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))
+
+
+# continuousTable_results percent change
+continuous_table_Average_percentChange <- as.data.frame(matrix(nrow = length(continuous_columns), ncol = 2))
+for (i in 1:length(continuous_columns)) {
+  col_index <- continuous_columns[i]  # Get the actual column index
+  continuous_table_Average_percentChange[i,1] <- colnames(results_df)[col_index]  # Store column name
+  continuous_table_Average_percentChange[i,2] <- sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]]))
+}
+write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "continuous_table_Average_percentChange.csv"))

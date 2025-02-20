@@ -36,15 +36,13 @@ colnames(results_matrix) <- columns
 
 # vectorize the true or false parameters by comparing the lenticel shape columns between both matrices
 results_matrix[,ordinal_columns] <- initial_phenotype_measurement_df[,ordinal_columns] == final_phenotype_measurement_df[,ordinal_columns]
-  
+# iterate through each row after sorting nominal columns in ascending order and use true false to compare the leaflet counts  
 for (i in 1:nrow(initial_phenotype_measurement_df)) {
   results_matrix[i,nominal_columns] <- sort(as.double(initial_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE) == sort(as.double(final_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE)
 }
 
 
-
-
-# for loop that iterates through the various columns
+# for loop that iterates through the various columns and calculates the percent change
 for (i in 1:nrow(results_matrix)) {
   results_matrix[i, 17:21] <- 100*(sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE)
   results_matrix[i, 23:27] <- 100*(sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE)
@@ -58,9 +56,10 @@ results_df <- data.frame(results_matrix)
 # converting all the 1 and 0 values to TRUE or FALSE with boolean phrase
 results_df[,c(ordinal_columns, nominal_columns)] <- results_df[,c(ordinal_columns,nominal_columns)] == 1
 
+final_results_df <- results_df[,sort(c(continuous_columns,nominal_columns,ordinal_columns))]
 # save the csv file of the results
 # write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
-
+write.csv(final_results_df, file = paste0(phenotype.wd, "consistencycheckResults_V2.csv"))
 # approaches to creating the table that calculates the percentage of TRUE values that matched after comparing the columns of both tables 
 categorical_table_results <- as.data.frame(matrix(nrow = length(ordinal_columns)+length(nominal_columns), ncol = 2))
 
@@ -87,7 +86,7 @@ categorical_table_results
 # categorical_table_results[19,1] <- colnames(results_df)[44]  # Store column name
 # categorical_table_results[19,2] <- 100 * (sum(results_df[[44]], na.rm = TRUE) / sum(!is.na(results_df[[44]])))
 
-# write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))
+write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))
 
 
 # continuousTable_results percent change

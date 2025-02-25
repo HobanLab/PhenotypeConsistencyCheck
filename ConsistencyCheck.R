@@ -36,30 +36,65 @@ colnames(results_matrix) <- columns
 
 # vectorize the true or false parameters by comparing the lenticel shape columns between both matrices
 results_matrix[,ordinal_columns] <- initial_phenotype_measurement_df[,ordinal_columns] == final_phenotype_measurement_df[,ordinal_columns]
+
+
+templeafletlengths_ <- vector(length = 29)
+tempnutlengths_ <- vector(length = 29)
+tempnutwidth_ <- vector(length = 29)
+tempcatkinlength_ <- vector(length = 29)
+for (i in 1:nrow(results_matrix)) {
+  templeafletlengths_[i] <- sum(is.na(final_phenotype_measurement_df[i,17:21]))==sum(is.na(initial_phenotype_measurement_df[i,17:21]))
+  tempnutlengths_[i] <- sum(is.na(final_phenotype_measurement_df[i,23:27]))==sum(is.na(initial_phenotype_measurement_df[i,23:27]))
+  tempnutwidth_[i] <- sum(is.na(final_phenotype_measurement_df[i,28:32]))==sum(is.na(initial_phenotype_measurement_df[i,28:32]))
+  tempcatkinlength_[i] <- sum(is.na(final_phenotype_measurement_df[i,33:37]))==sum(is.na(initial_phenotype_measurement_df[i,33:37]))
+}
+sameLeafletamounts <- which(templeafletlengths_ == TRUE)
+samenutlengths <- which(tempnutlengths_ == TRUE)
+samenutwidth <- which(tempnutwidth_ == TRUE)
+samecatkinlength <- which(tempcatkinlength_ == TRUE)
+
+# for loop that iterates through the various columns and calculates the percent change
+for (i in sameLeafletamounts) {
+  results_matrix[i, 17:21] <- 100*(sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE)
+} 
+
+for (i in samenutlengths) {
+  results_matrix[i, 23:27] <- 100*(sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE)
+} 
+
+for (i in samenutwidth) {
+  results_matrix[i, 28:32] <- 100*(sort(as.double(final_phenotype_measurement_df[i,28:32]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE)
+} 
+
+for (i in samecatkinlength) {
+  results_matrix[i, 33:37] <- 100*(sort(as.double(final_phenotype_measurement_df[i,33:37]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE)
+}
+temp_fixforconsistencyCheck <- results_matrix[,continuous_columns]
+write.csv(temp_fixforconsistencyCheck,paste0(phenotype.wd,"tempFixforConsistencyCONTINUOUS.csv"))
+# for loop that iterates through the various columns and calculates the percent change
+# for (i in 1:nrow(results_matrix)) {
+#   results_matrix[i, 17:21] <- 100*(sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE)
+#   results_matrix[i, 23:27] <- 100*(sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE)
+#   results_matrix[i, 28:32] <- 100*(sort(as.double(final_phenotype_measurement_df[i,28:32]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE)
+#   results_matrix[i, 33:37] <- 100*(sort(as.double(final_phenotype_measurement_df[i,33:37]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE)
+# }  
+
 # iterate through each row after sorting nominal columns in ascending order and use true false to compare the leaflet counts  
 for (i in 1:nrow(initial_phenotype_measurement_df)) {
   results_matrix[i,nominal_columns] <- sort(as.double(initial_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE) == sort(as.double(final_phenotype_measurement_df[i,nominal_columns]), na.last = TRUE)
 }
 
-
-# for loop that iterates through the various columns and calculates the percent change
-for (i in 1:nrow(results_matrix)) {
-  results_matrix[i, 17:21] <- 100*(sort(as.double(final_phenotype_measurement_df[i,17:21]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,17:21]), na.last = TRUE)
-  results_matrix[i, 23:27] <- 100*(sort(as.double(final_phenotype_measurement_df[i,23:27]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,23:27]), na.last = TRUE)
-  results_matrix[i, 28:32] <- 100*(sort(as.double(final_phenotype_measurement_df[i,28:32]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,28:32]), na.last = TRUE)
-  results_matrix[i, 33:37] <- 100*(sort(as.double(final_phenotype_measurement_df[i,33:37]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,33:37]), na.last = TRUE)
-}  
-
 # all the true false statements were turned to 1's and 0's after calling the  for loop. so we will want to change the matrix to a dataframe.
 results_df <- data.frame(results_matrix)
-
+# table of continouus percent change ONLY
+continuous_results_df <- results_df[, continuous_columns]
 # converting all the 1 and 0 values to TRUE or FALSE with boolean phrase
 results_df[,c(ordinal_columns, nominal_columns)] <- results_df[,c(ordinal_columns,nominal_columns)] == 1
-
 final_results_df <- results_df[,sort(c(continuous_columns,nominal_columns,ordinal_columns))]
 # save the csv file of the results
 # write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
 write.csv(final_results_df, file = paste0(phenotype.wd, "consistencycheckResults_V2.csv"))
+write.csv(continuous_results_df, file = paste0(phenotype.wd, "continuousresultsPercentChange.csv"))
 # approaches to creating the table that calculates the percentage of TRUE values that matched after comparing the columns of both tables 
 categorical_table_results <- as.data.frame(matrix(nrow = length(ordinal_columns)+length(nominal_columns), ncol = 2))
 

@@ -145,7 +145,7 @@ for (j in 1:length(ordinal_columns)) {
 
 categorical_table_results
 # write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))
-write.csv(categorical_table_results,paste0(phenotype.wd, "Consistency_Check_Results/Stats/categoricaltableresults_usingV2protocolSORTED.csv"))
+write.csv(categorical_table_results,paste0(phenotype.wd, "Consistency_Check_Results/Stats/Percentages/categoricalpercentages_usingV2protocolSORTED.csv"))
 
 
 # continuousTable_results percent change
@@ -155,4 +155,4 @@ for (i in 1:length(continuous_columns)) {
   continuous_table_Average_percentChange[i,1] <- colnames(results_df)[col_index]  # Store column name
   continuous_table_Average_percentChange[i,2] <- sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]]))
 }
-write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "Consistency_Check_Results/Stats/continuous_table_Average_percentChange_usingV2protocolSORTED.csv"))
+write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "Consistency_Check_Results/Stats/Average_Percent_Change/continuous_Average_percentChange_usingV2protocolSORTED.csv"))

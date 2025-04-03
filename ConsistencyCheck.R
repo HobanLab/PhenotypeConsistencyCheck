@@ -1,31 +1,21 @@
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # % 02/10/2025 Consistency Check between Phenotype_i and Phenotype_f % 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# install.packages("stringr")
-# library(stringr)
 
 # This script compares the measurements of various traits taken two times for 30 herbarium specimens. The traits measured were categorical and continuous data types. For the traits with categorical measurements, we calculated the percentage of measurements taken twice that remained the same. For traits with continuous measurements we calculated how much change there was between both the first and second measurement as a positive or negative percent change. Afterwards, for each categorical trait, we calculated the mean percent of traits that remained the same. For continuous traits, we also calculated the mean percent change for each continuous trait.
 # Set work directory and create objects ----
-phenotype.wd <- "C:/Users/gsalas/Documents/PhenotypeMeasurements/"
+phenotype.wd <- "~/GitHub/PhenotypeConsistencyCheck/"
 setwd(phenotype.wd)
+# convert characters which R does not recognize to NA ----
 # this object is a data frame that takes in the spreadsheet that measured traits for 30 herbarium specimens the first time.
-initial_phenotype_measurement_df <- read.csv("2025_03_05_Updated_Spreadsheet_Blindcheck_1.csv", na.strings = c("Unsure/in between", "Evenly split", "Trait not present", "Trait not present ", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue"))
+initial_phenotype_measurement_df <- read.csv(paste0(phenotype.wd,"Consistency_Check_Sheets/V2_Protocol/2025_03_05_Updated_Spreadsheet_Blindcheck_1.csv"), na.strings = c("Unsure/in between", "Evenly split", "Trait not present", "Trait not present ", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue"))
 # this object is a data frame that takes in the spreadsheet that measured traits for 30 herbarium specimens the second time.
-final_phenotype_measurement_df <- read.csv("2025_03_20_Updated_Spreadsheet_Blindcheck_2.csv", na.strings = c("Unsure/in between", "Evenly split", "Trait not present", "Trait not present ", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue"))
-# x <- c("Evenly split", "Trait not present", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue")
-# remove empty rows from both data sets
+final_phenotype_measurement_df <- read.csv(paste0(phenotype.wd, "Consistency_Check_Sheets/V2_Protocol/2025_03_20_Updated_Spreadsheet_Blindcheck_2.csv"), na.strings = c("Unsure/in between", "Evenly split", "Trait not present", "Trait not present ", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue"))
+# remove empty rows from both data sets ----
 initial_phenotype_measurement_df <- initial_phenotype_measurement_df[-c(16:999),]
 final_phenotype_measurement_df <- final_phenotype_measurement_df[-c(16:999),]
-# str_detect(initial_phenotype_measurement_df$Lenticel.shape.0..Most.or.all.lenticels.are.small..round..white..and.abundant..evenly.distributed..If.elongated..the.elongation.is.perpendicular.to.the.branch..1..Moderate.number.of.lenticels.are.small..round..white..and.abundant.lenticels..with.patchy.distribution..where.moderate.is.20.50...If.elongated..the.elongation.is.parallel.to.the.branch..2..More.than.50..of.lenticels.are.large..tan..corky.lenticels.with.a.patchy.distribution..Many.are.dash.shaped.and.elongated.parallel.to.the.branch..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue.Trait.to.early.to.measure., "Trait*")
 
-# testssub <- apply(initial_phenotype_measurement_df, 2, function(x) str_detect(x,"Trait*"))
-# apply(initial_phenotype_measurement_df, 2, function(x) str_replace_all(x, "Trait not present", "NA"))
-
-# convert characters which R does not recognize to NA
-# initial_phenotype_measurement_df[initial_phenotype_measurement_df == "Evenly split", "Trait not present", "Trait not measurable/ obscured or image quality issue", "Trait to early to measure", "Trait too early to measure", "Trait not measurable/obscured or image quality issue"] <- NA
-# final_phenotype_measurement_df[final_phenotype_measurement_df == "n/a"] <- NA
-# apply(initial_phenotype_measurement_df, 2, function(x) str_detect(x,"Trait*"))
-# group the data types into different objects so they are easier to reference later on
+# group the data types into different objects so they are easier to reference later on ----
 # ordinal columns
 ordinal_columns <- c(6:15,21,37,48)
 # discrete columns 
@@ -71,48 +61,52 @@ sameleafletcountamounts <- which(templeafletcount == TRUE)
 sameleafscarangle <- which(templeafscarangle == TRUE)
 
 # for loop that iterates through the various columns and calculates the percent change
-# for (i in sameLeaflengths_) {
-#   results_matrix[i, 16:20] <- 100*(sort(as.double(final_phenotype_measurement_df[i,16:20]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,16:20]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,16:20]), na.last = TRUE)
-# } 
-# 
-# for (i in samenutlengths) {
-#   results_matrix[i, 22:26] <- 100*(sort(as.double(final_phenotype_measurement_df[i,22:26]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,22:26]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,22:26]), na.last = TRUE)
-# } 
-# 
-# for (i in samenutwidth) {
-#   results_matrix[i, 27:31] <- 100*(sort(as.double(final_phenotype_measurement_df[i,27:31]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,27:31]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i, 27:31]), na.last = TRUE)
-# } 
-# 
-# for (i in samecatkinlength) {
-#   results_matrix[i, 32:36] <- 100*(sort(as.double(final_phenotype_measurement_df[i,32:36]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,32:36]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,32:36]), na.last = TRUE)
-# }
-# 
-# for (i in sameleafscarangle) {
-#   results_matrix[i, 43:47] <- 100*(sort(as.double(final_phenotype_measurement_df[i,43:47]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,43:47]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,43:47]), na.last = TRUE)
-# }
 for (i in sameLeaflengths_) {
-  results_matrix[i, 16:20] <- 100*((as.double(final_phenotype_measurement_df[i,16:20])) - (as.double(initial_phenotype_measurement_df[i,16:20])))/(as.double(initial_phenotype_measurement_df[i,16:20]))
-} 
+  results_matrix[i, 16:20] <- 100*(sort(as.double(final_phenotype_measurement_df[i,16:20]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,16:20]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,16:20]), na.last = TRUE)
+}
 
 for (i in samenutlengths) {
-  results_matrix[i, 22:26] <- 100*((as.double(final_phenotype_measurement_df[i,22:26])) - (as.double(initial_phenotype_measurement_df[i,22:26])))/(as.double(initial_phenotype_measurement_df[i,22:26]))
-} 
+  results_matrix[i, 22:26] <- 100*(sort(as.double(final_phenotype_measurement_df[i,22:26]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,22:26]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,22:26]), na.last = TRUE)
+}
 
 for (i in samenutwidth) {
-  results_matrix[i, 27:31] <- 100*((as.double(final_phenotype_measurement_df[i,27:31])) - (as.double(initial_phenotype_measurement_df[i,27:31])))/(as.double(initial_phenotype_measurement_df[i,27:31]))
-} 
+  results_matrix[i, 27:31] <- 100*(sort(as.double(final_phenotype_measurement_df[i,27:31]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,27:31]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i, 27:31]), na.last = TRUE)
+}
 
 for (i in samecatkinlength) {
-  results_matrix[i, 32:36] <- 100*((as.double(final_phenotype_measurement_df[i,32:36])) - (as.double(initial_phenotype_measurement_df[i,32:36])))/(as.double(initial_phenotype_measurement_df[i,32:36]))
+  results_matrix[i, 32:36] <- 100*(sort(as.double(final_phenotype_measurement_df[i,32:36]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,32:36]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,32:36]), na.last = TRUE)
 }
 
 for (i in sameleafscarangle) {
-  results_matrix[i, 43:47] <- 100*((as.double(final_phenotype_measurement_df[i,43:47])) - (as.double(initial_phenotype_measurement_df[i,43:47])))/(as.double(initial_phenotype_measurement_df[i,43:47]))
+  results_matrix[i, 43:47] <- 100*(sort(as.double(final_phenotype_measurement_df[i,43:47]), na.last = TRUE) - sort(as.double(initial_phenotype_measurement_df[i,43:47]), na.last = TRUE))/sort(as.double(initial_phenotype_measurement_df[i,43:47]), na.last = TRUE)
 }
-# iterate through each row after sorting discrete columns in ascending order and use true false to compare the leaflet counts  
+
 for (i in sameleafletcountamounts) {
-  results_matrix[i, discrete_columns] <- (as.double(initial_phenotype_measurement_df[i,discrete_columns])) == (as.double(final_phenotype_measurement_df[i,discrete_columns]))
+    results_matrix[i, discrete_columns] <- sort(as.double(initial_phenotype_measurement_df[i,discrete_columns]), na.last = TRUE) == sort(as.double(final_phenotype_measurement_df[i,discrete_columns]), na.last = TRUE)
 }
+# for (i in sameLeaflengths_) {
+#   results_matrix[i, 16:20] <- 100*((as.double(final_phenotype_measurement_df[i,16:20])) - (as.double(initial_phenotype_measurement_df[i,16:20])))/(as.double(initial_phenotype_measurement_df[i,16:20]))
+# } 
+# 
+# for (i in samenutlengths) {
+#   results_matrix[i, 22:26] <- 100*((as.double(final_phenotype_measurement_df[i,22:26])) - (as.double(initial_phenotype_measurement_df[i,22:26])))/(as.double(initial_phenotype_measurement_df[i,22:26]))
+# } 
+# 
+# for (i in samenutwidth) {
+#   results_matrix[i, 27:31] <- 100*((as.double(final_phenotype_measurement_df[i,27:31])) - (as.double(initial_phenotype_measurement_df[i,27:31])))/(as.double(initial_phenotype_measurement_df[i,27:31]))
+# } 
+# 
+# for (i in samecatkinlength) {
+#   results_matrix[i, 32:36] <- 100*((as.double(final_phenotype_measurement_df[i,32:36])) - (as.double(initial_phenotype_measurement_df[i,32:36])))/(as.double(initial_phenotype_measurement_df[i,32:36]))
+# }
+# 
+# for (i in sameleafscarangle) {
+#   results_matrix[i, 43:47] <- 100*((as.double(final_phenotype_measurement_df[i,43:47])) - (as.double(initial_phenotype_measurement_df[i,43:47])))/(as.double(initial_phenotype_measurement_df[i,43:47]))
+# }
+# # iterate through each row after sorting discrete columns in ascending order and use true false to compare the leaflet counts  
+# for (i in sameleafletcountamounts) {
+#   results_matrix[i, discrete_columns] <- (as.double(initial_phenotype_measurement_df[i,discrete_columns])) == (as.double(final_phenotype_measurement_df[i,discrete_columns]))
+# }
 # temp_fixforconsistencyCheck <- results_matrix[,continuous_columns]
 # write.csv(temp_fixforconsistencyCheck,paste0(phenotype.wd,"tempFixforConsistencyCONTINUOUS.csv"))
 
@@ -124,11 +118,9 @@ continuous_results_df <- results_df[, continuous_columns]
 results_df[,c(ordinal_columns, discrete_columns)] <- results_df[,c(ordinal_columns,discrete_columns)] == 1
 final_results_df <- results_df[,sort(c(continuous_columns,discrete_columns,ordinal_columns))]
 # save the csv file of the results
-# write.csv(results_df, file = paste0(phenotype.wd, "consistencycheckResults.csv"))
-# write.csv(final_results_df, file = paste0(phenotype.wd, "consistencycheckResults_V2.csv"))
-write.csv(final_results_df, file = paste0(phenotype.wd, "consistencycheckResults_usingV2protocol.csv"))
+write.csv(final_results_df, file = paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/consistencycheckResults_usingV2protocolSORTED.csv"))
 # write.csv(continuous_results_df, file = paste0(phenotype.wd, "continuousresultsPercentChange.csv"))
-write.csv(continuous_results_df, file = paste0(phenotype.wd, "continuousresultsPercentChange_usingV2protocol.csv"))
+# write.csv(continuous_results_df, file = paste0(phenotype.wd, "continuousresultsPercentChange_usingV2protocol.csv"))
 
 # approaches to creating the table that calculates the percentage of TRUE values that matched after comparing the columns of both tables 
 categorical_table_results <- as.data.frame(matrix(nrow = length(ordinal_columns)+length(discrete_columns), ncol = 2))
@@ -153,7 +145,7 @@ for (j in 1:length(ordinal_columns)) {
 
 categorical_table_results
 # write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults.csv"))
-write.csv(categorical_table_results,paste0(phenotype.wd, "categoricaltableresults_usingV2protocolFIXED.csv"))
+write.csv(categorical_table_results,paste0(phenotype.wd, "Consistency_Check_Results/Stats/categoricaltableresults_usingV2protocolSORTED.csv"))
 
 
 # continuousTable_results percent change
@@ -163,4 +155,4 @@ for (i in 1:length(continuous_columns)) {
   continuous_table_Average_percentChange[i,1] <- colnames(results_df)[col_index]  # Store column name
   continuous_table_Average_percentChange[i,2] <- sum(results_df[[col_index]], na.rm = TRUE) / sum(!is.na(results_df[[col_index]]))
 }
-write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "continuous_table_Average_percentChange_usingV2protocol.csv"))
+write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "Consistency_Check_Results/Stats/continuous_table_Average_percentChange_usingV2protocolSORTED.csv"))

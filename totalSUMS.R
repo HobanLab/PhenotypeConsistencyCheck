@@ -48,8 +48,14 @@ initial_phenotype_measurement_df$Thickness_of_twig <- thickness_column[initial_p
 initial_phenotype_measurement_df$Color_of_twig <- color_column[initial_phenotype_measurement_df$Color_of_twig]
 initial_phenotype_measurement_df$Hair_texture_of_twig <- trichomes_column[initial_phenotype_measurement_df$Hair_texture_of_twig]
 
-# ordinal columns
+final_phenotype_measurement_df$Thickness_of_twig <- thickness_column[final_phenotype_measurement_df$Thickness_of_twig]
+final_phenotype_measurement_df$Color_of_twig <- color_column[final_phenotype_measurement_df$Color_of_twig]
+final_phenotype_measurement_df$Hair_texture_of_twig <- trichomes_column[final_phenotype_measurement_df$Hair_texture_of_twig]
+
+
+# ordinal columns for both initial and final phenotype spreadsheets
 ordinal_columns <- c(6:11,13,15,21,37)
+
 
 
 # test_vector_store_sums <- vector(length = 100)
@@ -86,7 +92,9 @@ for (i in 1:15) {
 initial_ordinal_phenotypemeasurements <- matrix(nrow =length(1:nrow(initial_phenotype_measurement_df[1])), 
                                                 ncol = 1, dimnames = list(Specimen,
                                                                           c("Mean score")))
-
+final_ordinal_phenotypemeasurements <- matrix(nrow =length(1:nrow(final_phenotype_measurement_df[1])), 
+                                                ncol = 1, dimnames = list(Specimen,
+                                                                          c("Mean score")))
 
 # Loop over each row
 for (j in 1:15) {
@@ -104,6 +112,40 @@ for (j in 1:15) {
   # Store the mean of the 100 sampled sums into the output matrix
   initial_ordinal_phenotypemeasurements[j,] <- mean(test_vector_store_sums)
 }
+
+# Loop over each row
+for (j in 1:15) {
+  # Reset vector for this row
+  test_vector_store_sums <- numeric(100)
+  
+  for (i in 1:100) {
+    # Randomly sample 5 columns from the ordinal columns
+    random_ordinal_columns <- sample(ordinal_columns, 5, replace = FALSE)
+    
+    # Sum values in that row and the sampled columns
+    test_vector_store_sums[i] <- sum(final_phenotype_measurement_df[j, random_ordinal_columns], na.rm = TRUE)
+  }
+  
+  # Store the mean of the 100 sampled sums into the output matrix
+  final_ordinal_phenotypemeasurements[j,] <- mean(test_vector_store_sums)
+}
+
+
+write.csv(initial_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/initial_ordinal_measurements100reps.csv"))
+write.csv(final_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/final_ordinal_measurements100reps.csv"))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # initial_phenotype_measurement_df$Total_score <- rowSums(initial_phenotype_measurement_df[,random_columns], na.rm = TRUE)

@@ -40,6 +40,10 @@ final_phenotype_measurement_df <- read.csv(paste0(phenotype.wd,"Consistency_Chec
 initial_phenotype_measurement_df <- initial_phenotype_measurement_df[-c(16:999),]
 final_phenotype_measurement_df <- final_phenotype_measurement_df[-c(16:999),]
 
+# ordinal columns for both initial and final phenotype spreadsheets
+ordinal_columns <- c(6:11,13,15,21,37)
+best_categorical_traits <- c(6, 7, 9, 21, 33)
+
 thickness_column <- c("Slender" = 0, "Stout"= 1)
 color_column <- c("Dark olive gree to red brown" = 0, "Tan to brown" = 1, "Tan or light green" = 2)
 trichomes_column <- c("Some (or no) hairs" = 0, "Patchy hairs" = 1, "Abundant hairs" = 2)
@@ -53,35 +57,9 @@ final_phenotype_measurement_df$Color_of_twig <- color_column[final_phenotype_mea
 final_phenotype_measurement_df$Hair_texture_of_twig <- trichomes_column[final_phenotype_measurement_df$Hair_texture_of_twig]
 
 
-# ordinal columns for both initial and final phenotype spreadsheets
-ordinal_columns <- c(6:11,13,15,21,37)
+initial_phenotype_measurement_df$Total_score <- rowSums(initial_phenotype_measurement_df[,ordinal_columns], na.rm = TRUE)
+final_phenotype_measurement_df$Total_score <- rowSums(final_phenotype_measurement_df[,ordinal_columns], na.rm = TRUE)
 
-
-
-# test_vector_store_sums <- vector(length = 100)
-# 
-# initial_ordinal_phenotypemeasurements <- matrix(nrow = length(colnames(initial_phenotype_measurement_df)[ordinal_columns]), ncol = 1, dimnames = list(colnames(initial_phenotype_measurement_df)[ordinal_columns],
-#                                                                                                                            c("Mean score")))
-# random_ordinal_columns <- sample(ncol(initial_phenotype_measurement_df[ordinal_columns]), 5, replace = FALSE)
-# 
-# test_vector_store_sums[6] <- sum(initial_ordinal_phenotypemeasurements[1,random_ordinal_columns], na.rm = TRUE)
-# 
-# test_vector_store_sums
-# 
-# initial_ordinal_phenotypemeasurements$MeanScore[1] <- mean(test_vector_store_sums)
-# 
-# test_vector_store_sums <- vector(length = 100)
-# initial_ordinal_phenotypemeasurements <- matrix(nrow = length(colnames(initial_phenotype_measurement_df)[ordinal_columns]), ncol = 1, dimnames = list(colnames(initial_phenotype_measurement_df)[ordinal_columns],
-#                                                                                                                                                       c("Mean score")))
-# 
-# for (i in 1:100) {
-#   for (j in 1:10) {
-#     random_ordinal_columns <- sample(ncol(initial_phenotype_measurement_df[ordinal_columns]), 5, replace = FALSE)
-#     test_vector_store_sums[i] <- sum(initial_ordinal_phenotypemeasurements[j,random_ordinal_columns], na.rm = TRUE)
-#     initial_ordinal_phenotypemeasurements$MeanScore[j] <- mean(test_vector_store_sums) 
-#   }
-# }
-# sum(test_vector_store_sums)/6
 
 Specimen <- vector(length = 15)
 for (i in 1:15) {
@@ -133,42 +111,3 @@ for (j in 1:15) {
 
 write.csv(initial_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/initial_ordinal_measurements100reps.csv"))
 write.csv(final_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/final_ordinal_measurements100reps.csv"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# initial_phenotype_measurement_df$Total_score <- rowSums(initial_phenotype_measurement_df[,random_columns], na.rm = TRUE)
-# 
-# temp_rows <- sample(1:nrow(initial_phenotype_measurement_df), 5, replace = FALSE)[i]
-# 
-# 
-# for (i in 1:100) {
-#   random_columns[i] <- sample(1:ncol(initial_phenotype_measurement_df[,ordinal_columns]), 5, replace = FALSE)
-#   # rowSums(initial_phenotype_measurement_df[,ordinal_columns], na.rm = TRUE)
-# }
-# c(ordinal_columns)
-# initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue
-
-# initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue
-# 
-# test <- c("slender" = 0, "stout" = 1)
-# initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue <- test[initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue]
-
-# initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue <- test[initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue]
-# 
-# replace(temp, c("Slender","Slender","Slender","Slender","Slender","Slender"), c(2,10,11,13,14,15))
-# 
-# initial_phenotype_measurement_df$Color.of.twig.Dark.olive.green.to.red.brown.Tan.to.brown.Tan.or.light.green.Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue[1:10]
-# as.numeric(initial_phenotype_measurement_df$Color.of.twig.Dark.olive.green.to.red.brown.Tan.to.brown.Tan.or.light.green.Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue)
-# initial_phenotype_measurement_df$Thickness.of.twig.Stout..thick..hulky..Slender..thin..Unsure.in.between.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue <- ifelse() 1

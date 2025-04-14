@@ -166,14 +166,14 @@ for (i in 1:length(continuous_columns)) {
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# % 04/02 % ----
+# % 04/02 Calculate the mean  % ----
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # The goal of this portion of the script is to randomly sample 5 ordinal columns that calculate the overall phenotype score for butternut hybridity, take the sum of this sample, record the score, repeat this process 100 times, and calculate the mean. 
 
-# update the score column to not include the score output in the random sampling
+# update ordinal columns object to not include the score output in the random sampling
 ordinal_columns_withoutScorecolumn <- c(6:11,13,15,21,37)
-# best_categorical_traits <- c(6, 7, 9, 21, 33)
+best_categorical_traits <- c(7,9, 11, 15, 37)
 
 # creating a named vector: assign numeric values to twig characteristics  
 thickness_column <- c("Slender" = 0, "Stout"= 1)
@@ -245,3 +245,47 @@ for (j in 1:15) {
 
 # write.csv(initial_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/initial_ordinal_measurements100reps.csv"))
 # write.csv(final_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/final_ordinal_measurements100reps.csv"))
+
+initial_ordinal_SumvsMeanphenotypemeasurements <- matrix(nrow =length(1:nrow(initial_phenotype_measurement_df[1])), 
+                                                    ncol = 3, dimnames = list(Specimen,
+                                                                              c("Sum score total", "Mean score TOTAL", "Best Traits")))
+final_ordinal_SumvsMeanphenotypemeasurements <- matrix(nrow =length(1:nrow(initial_phenotype_measurement_df[1])), 
+                                                  ncol = 3, dimnames = list(Specimen,
+                                                                            c("Sum score total", "Mean score TOTAL", "Best Traits")))
+
+initial_ordinal_SumvsMeanphenotypemeasurements[,1] <- rowSums(initial_phenotype_measurement_df[,ordinal_columns_withoutScorecolumn], na.rm = TRUE)
+# Loop over each row
+for (j in 1:15) {
+  # Reset vector for this row
+  test_vector_store_sums <- numeric(100)
+  for (i in 1:100) {
+  # Sum values in that row and the sampled columns
+    test_vector_store_sums[i] <- sum(initial_phenotype_measurement_df[j, ordinal_columns_withoutScorecolumn], na.rm = TRUE)
+  }
+
+  # Store the mean of the 100 sampled sums into the output matrix
+  initial_ordinal_SumvsMeanphenotypemeasurements[j,2] <- mean(test_vector_store_sums)
+}
+
+initial_ordinal_SumvsMeanphenotypemeasurements[,3] <- rowSums(initial_phenotype_measurement_df[,best_categorical_traits], na.rm = TRUE)
+
+
+final_ordinal_SumvsMeanphenotypemeasurements[,1] <- rowSums(final_phenotype_measurement_df[,ordinal_columns_withoutScorecolumn], na.rm = TRUE)
+# Loop over each row
+for (j in 1:15) {
+  # Reset vector for this row
+  test_vector_store_sums <- numeric(100)
+  for (i in 1:100) {
+    # Sum values in that row and the sampled columns
+    test_vector_store_sums[i] <- sum(final_phenotype_measurement_df[j, ordinal_columns_withoutScorecolumn], na.rm = TRUE)
+  }
+
+  # Store the mean of the 100 sampled sums into the output matrix
+  final_ordinal_SumvsMeanphenotypemeasurements[j,2] <- mean(test_vector_store_sums)
+}
+
+# find the sum for both data frames and add a new column to each for the total sum
+final_ordinal_SumvsMeanphenotypemeasurements[,3] <- rowSums(final_phenotype_measurement_df[,best_categorical_traits], na.rm = TRUE)
+
+write.csv(initial_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/firstmeasuremeants_sumvsmeanvsbesttraits.csv"))
+write.csv(final_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/blindmeasuremeants_sumvsmeanvsbesttraits.csv"))

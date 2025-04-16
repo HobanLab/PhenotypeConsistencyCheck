@@ -246,46 +246,42 @@ for (j in 1:15) {
 # write.csv(initial_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/initial_ordinal_measurements100reps.csv"))
 # write.csv(final_ordinal_phenotypemeasurements, paste0(phenotype.wd, "Consistency_Check_Results/Comparisons/final_ordinal_measurements100reps.csv"))
 
+##
+# create final table that shows the four approaches to calculate the hybridity score ---- 
+##
 initial_ordinal_SumvsMeanphenotypemeasurements <- matrix(nrow =length(1:nrow(initial_phenotype_measurement_df[1])), 
-                                                    ncol = 3, dimnames = list(Specimen,
-                                                                              c("Sum score total", "Mean score TOTAL", "Best Traits")))
+                                                         ncol = 4, dimnames = list(Specimen,
+                                                                                   c("Sum of All Traits", "Mean of Randomly Sampled Traits", "Sum of Best Traits", "Sum of Purdue Traits")))
 final_ordinal_SumvsMeanphenotypemeasurements <- matrix(nrow =length(1:nrow(initial_phenotype_measurement_df[1])), 
-                                                  ncol = 3, dimnames = list(Specimen,
-                                                                            c("Sum score total", "Mean score TOTAL", "Best Traits")))
+                                                       ncol = 4, dimnames = list(Specimen,
+                                                                                 c("Sum of All Traits", "Mean of Randomly Sampled Traits", "Sum of Best Traits", "Sum of Purdue Traits")))
 
 initial_ordinal_SumvsMeanphenotypemeasurements[,1] <- rowSums(initial_phenotype_measurement_df[,ordinal_columns_withoutScorecolumn], na.rm = TRUE)
-# Loop over each row
-for (j in 1:15) {
-  # Reset vector for this row
-  test_vector_store_sums <- numeric(100)
-  for (i in 1:100) {
-  # Sum values in that row and the sampled columns
-    test_vector_store_sums[i] <- sum(initial_phenotype_measurement_df[j, ordinal_columns_withoutScorecolumn], na.rm = TRUE)
-  }
-
-  # Store the mean of the 100 sampled sums into the output matrix
-  initial_ordinal_SumvsMeanphenotypemeasurements[j,2] <- mean(test_vector_store_sums)
-}
-
+initial_ordinal_SumvsMeanphenotypemeasurements[,2] <- initial_ordinal_phenotypemeasurements[,1]
 initial_ordinal_SumvsMeanphenotypemeasurements[,3] <- rowSums(initial_phenotype_measurement_df[,best_categorical_traits], na.rm = TRUE)
 
 
 final_ordinal_SumvsMeanphenotypemeasurements[,1] <- rowSums(final_phenotype_measurement_df[,ordinal_columns_withoutScorecolumn], na.rm = TRUE)
-# Loop over each row
-for (j in 1:15) {
-  # Reset vector for this row
-  test_vector_store_sums <- numeric(100)
-  for (i in 1:100) {
-    # Sum values in that row and the sampled columns
-    test_vector_store_sums[i] <- sum(final_phenotype_measurement_df[j, ordinal_columns_withoutScorecolumn], na.rm = TRUE)
-  }
-
-  # Store the mean of the 100 sampled sums into the output matrix
-  final_ordinal_SumvsMeanphenotypemeasurements[j,2] <- mean(test_vector_store_sums)
-}
-
+final_ordinal_SumvsMeanphenotypemeasurements[,2] <- final_ordinal_phenotypemeasurements[,1]
 # find the sum for both data frames and add a new column to each for the total sum
 final_ordinal_SumvsMeanphenotypemeasurements[,3] <- rowSums(final_phenotype_measurement_df[,best_categorical_traits], na.rm = TRUE)
 
-write.csv(initial_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/firstmeasuremeants_sumvsmeanvsbesttraits.csv"))
-write.csv(final_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/blindmeasuremeants_sumvsmeanvsbesttraits.csv"))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# % Approach to calculating using the Purdue protocol %----
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ordinal_columns_exceptTwigandScoreStandardCheck <- initial_phenotype_measurement_df[,c(6, 7,11, 13, 15, 21, 37)]
+dormantTwigcolumnsStandardCheck <- initial_phenotype_measurement_df[,c(8:10)]
+purdue_traitsStandardCheck <- round(rowSums(ordinal_columns_exceptTwigandScoreStandardCheck, na.rm = TRUE) + rowMeans(dormantTwigcolumnsStandardCheck, na.rm = TRUE), digits = 2)
+
+initial_ordinal_SumvsMeanphenotypemeasurements[,4] <- purdue_traitsStandardCheck
+
+ordinal_columns_exceptTwigandScoreBlindCheck <- final_phenotype_measurement_df[,c(6, 7,11, 13, 15, 21, 37)]
+dormantTwigcolumnsBlindCheck <- final_phenotype_measurement_df[,c(8:10)]
+purdue_traitsBlindCheck <- round(rowSums(ordinal_columns_exceptTwigandScoreBlindCheck, na.rm = TRUE) + rowMeans(dormantTwigcolumnsBlindCheck, na.rm = TRUE), digits = 2)
+
+
+final_ordinal_SumvsMeanphenotypemeasurements[,4] <- purdue_traits
+
+
+write.csv(initial_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/StandardCheck_sumvsmeanvsbesttraits.csv"))
+write.csv(final_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/BlindCheck_sumvsmeanvsbesttraits.csv"))

@@ -165,9 +165,9 @@ for (i in 1:length(continuous_columns)) {
 # write.csv(continuous_table_Average_percentChange,paste0(phenotype.wd, "Consistency_Check_Results/Stats/Average_Percent_Change/continuous_Average_percentChange_usingV2protocolSORTED.csv"))
 
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # % 04/02 Calculate the mean  % ----
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # The goal of this portion of the script is to randomly sample 5 ordinal columns that calculate the overall phenotype score for butternut hybridity, take the sum of this sample, record the score, repeat this process 100 times, and calculate the mean. 
 
@@ -287,7 +287,7 @@ write.csv(initial_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"C
 write.csv(final_ordinal_SumvsMeanphenotypemeasurements, paste0(phenotype.wd,"Consistency_Check_Results/Comparisons/BlindCheck_sumvsmeanvsbesttraits.csv"))
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#% 04/17/2025 Data visualization of GBIF specimens %
+#% 04/17/2025 Data visualization of GBIF specimens % ----
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # install packages & library to change column names
@@ -324,11 +324,14 @@ initial_phenotype_measurement_df <- read.csv(paste0(phenotype.wd,"Consistency_Ch
     Length_of_leaves = Leaves.0..Most.leaves.less.than.45.72.cm.long.1..Many.leaves.45.72.cm.or.longer.Evenly.split.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue.Trait.to.early.to.measure,
     Length_of_catkins = Catkin.length.score.0...Shorter.than.11.43.cm.1..Betweeen.11.43...13.97.cm..2..Longer.than.13.97.cm.Evenly.split.Trait.not.present.Trait.not.measurable..obscured.or.image.quality.issue
   )
-initial_phenotype_measurement_df_maps <- initial_phenotype_measurement_df[-c(30:999),]
+initial_phenotype_measurement_df_maps <- initial_phenotype_measurement_df[-c(36:999),]
 
 butternut_gbif <- occ_search(
+  limit = 5000,
   scientificName = "Juglans cinerea",
   hasCoordinate = TRUE,
+  basisOfRecord = "PRESERVED_SPECIMEN",
+  mediaType = "StillImage"
 )
 
 # Extract just the data
@@ -353,7 +356,7 @@ usa <- rnaturalearth::ne_states(country = "United States of America", returnclas
 
 ggplot() +
   geom_sf(data = usa, fill = "lightgray", color = "gray") +
-  # geom_sf(data = butternut_sf, color = "#993404", size = 1, alpha = 0.5) +
+  geom_sf(data = butternut_sf, color = "#993404", size = 1, alpha = 0.5) +
   geom_sf(data = my_pts_sf, color = "#0570b0", fill = "#92c5de", size = 2, shape = 21, stroke = 1.2) +
   coord_sf(xlim = c(-125, -65), ylim = c(25, 50)) +  # zoom to eastern US
   theme_minimal() +
@@ -362,9 +365,9 @@ ggplot() +
   )
 
 ###
-# Convert numeric months to factor with month names for plotting
+# Convert numeric months to factor with month names for plotting ----
 ###
-
+initial_phenotype_measurement_df <- initial_phenotype_measurement_df[-c(36:999),]
 initial_phenotype_measurement_df$Month <- factor(initial_phenotype_measurement_df$Month, levels = 1:12, labels = month.name)
 
 # Count and plot
